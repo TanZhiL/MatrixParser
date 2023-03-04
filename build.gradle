@@ -9,3 +9,20 @@ java {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 }
+def zipFile = file("build/libs/MatrixParser.jar"); // 开发的代码编译出的jar位置，
+
+task makeJar(type: Jar) {
+    archiveName "excuteMatrixParser.jar"//目标jar包名称,最终使用的可执行jar.
+    //删除存在的
+    delete "build/libs/" + archiveName
+    from(project.zipTree("libs/gson-2.8.5.jar")) //第三方jar
+    from(project.zipTree("libs/json-20190722.jar")) //第三方jar
+    from(project.zipTree("libs/reactive-streams-1.0.2.jar")) //第三方jar
+    from(project.zipTree("libs/rxjava-2.2.11.jar")) //第三方jar
+    from zipTree(zipFile) //代码编译的jar
+    //打进jar包后的文件目录
+    destinationDir = file("build/libs")
+    manifest.attributes("Main-Class": "com.matrix.parser.MatrixParser") //一定要添加，如果不添加的话，可执行jar找不到， 提示 jar中没有主清单属性。
+}
+
+makeJar.dependsOn(build)
